@@ -1,5 +1,5 @@
 
-# 🚀 Frontend & System Design Interview Guide
+# 🚀 MERN Interview Guide
 
 This guide covers essential topics for **Frontend, JavaScript, React, System Design, Performance Optimization, and Security**. It includes key concepts, best practices, and coding challenges to help you ace your technical interviews.  
 
@@ -2501,6 +2501,206 @@ readStream.on("data", (chunk) => {
 ```
 
 ✅ **Streams improve performance by processing data in chunks.**  
+
+# **16. MongoDB**
+
+## **1. Aggregation Pipeline**
+
+### **16.1: What is the Aggregation Pipeline in MongoDB?**
+**Answer:**  
+The aggregation pipeline is a framework for processing and transforming data in MongoDB. It consists of multiple stages that process documents step by step.
+
+**Use Case:**  
+- Analyzing sales data (e.g., total sales per product category)
+- Filtering and transforming data for reporting
+
+**Example:** Find the total sales amount per product category.
+```js
+ db.sales.aggregate([
+   { $group: { _id: "$category", totalSales: { $sum: "$amount" } } }
+ ]);
+```
+
+---
+
+### **16.2: How does `$lookup` work in aggregation?**
+**Answer:**  
+`$lookup` is used for performing a left outer join between two collections.
+
+**Use Case:**  
+- Fetching order details along with customer information
+
+**Example:** Join `orders` with `customers` collection.
+```js
+ db.orders.aggregate([
+   {
+     $lookup: {
+       from: "customers",
+       localField: "customerId",
+       foreignField: "_id",
+       as: "customerDetails"
+     }
+   }
+ ]);
+```
+
+---
+
+### **16.3: How can you filter and sort data using aggregation?**
+**Example:** Find all orders above $500, sorted by date.
+```js
+ db.orders.aggregate([
+   { $match: { totalAmount: { $gt: 500 } } },
+   { $sort: { orderDate: -1 } }
+ ]);
+```
+
+---
+
+## **2. Indexing & Performance Optimization**
+
+### **16.4: What are the different types of indexes in MongoDB?**
+**Answer:**
+- **Single-field index**: Index on one field.
+- **Compound index**: Index on multiple fields.
+- **Multi-key index**: Index on an array field.
+- **Text index**: Index for full-text search.
+- **Geospatial index**: Index for location-based queries.
+
+**Use Case:**  
+- Speeding up queries on large datasets.
+
+**Example:** Creating an index on the `email` field.
+```js
+ db.users.createIndex({ email: 1 });
+```
+
+---
+
+### **16.5: How can you analyze query performance?**
+**Answer:**  
+Use `.explain("executionStats")` to inspect query execution.
+
+**Example:** Analyze a query that finds users older than 30.
+```js
+ db.users.find({ age: { $gt: 30 } }).explain("executionStats");
+```
+
+---
+
+### **16.6: What is a compound index, and when should you use it?**
+**Answer:**  
+A compound index includes multiple fields, improving queries that filter or sort by those fields.
+
+**Use Case:**  
+- Searching for users by both `lastName` and `firstName`.
+
+**Example:**  
+```js
+ db.users.createIndex({ lastName: 1, firstName: 1 });
+```
+
+---
+
+## **3. Schema Design & Relationships**
+
+### **16.7: What is the difference between embedding and referencing?**
+**Answer:**  
+- **Embedding**: Storing related data within the same document.
+- **Referencing**: Storing related data separately and linking via `_id`.
+
+**Use Case:**
+- **Embedding** for user profiles with small address objects.
+- **Referencing** for large product reviews linked to products.
+
+**Example (Embedding):**  
+```json
+{
+  "_id": 1,
+  "name": "John",
+  "address": { "city": "New York", "zip": "10001" }
+}
+```
+
+**Example (Referencing):**
+```json
+{
+  "_id": 1,
+  "userId": 5,
+  "review": "Great product!",
+  "productId": 101
+}
+```
+
+---
+
+## **4. Transactions & Consistency**
+
+### **16.8: How do MongoDB transactions work?**
+**Answer:**  
+Transactions ensure atomicity across multiple operations.
+
+**Use Case:**  
+- Bank transactions (debit from one account, credit to another).
+
+**Example:** Transfer money using transactions.
+```js
+ const session = db.getMongo().startSession();
+ session.startTransaction();
+ try {
+   db.accounts.updateOne({ _id: 1 }, { $inc: { balance: -100 } }, { session });
+   db.accounts.updateOne({ _id: 2 }, { $inc: { balance: 100 } }, { session });
+   session.commitTransaction();
+ } catch (error) {
+   session.abortTransaction();
+ }
+ session.endSession();
+```
+
+---
+
+## **5. Sharding & Replication**
+
+### **16.9: What is the difference between replication and sharding?**
+**Answer:**  
+- **Replication**: Copying data across multiple nodes for fault tolerance.
+- **Sharding**: Splitting data across multiple servers for scalability.
+
+**Use Case:**
+- **Replication** for high availability.
+- **Sharding** for handling large-scale distributed data.
+
+**Example:** Enable sharding for a collection.
+```js
+ sh.enableSharding("myDatabase");
+ sh.shardCollection("myDatabase.users", { _id: "hashed" });
+```
+
+---
+
+### **16.10: How does MongoDB handle failover in a replica set?**
+**Answer:**  
+MongoDB automatically elects a new primary node if the existing primary node fails.
+
+**Use Case:**  
+- Ensuring high availability in a distributed database.
+
+---
+
+### **16.11: How would you set up sharding in MongoDB?**
+**Answer:**  
+1. Enable sharding on a database.
+2. Shard a collection based on a shard key.
+3. Add shards to the cluster.
+
+**Example:**
+```js
+ sh.enableSharding("ecommerce");
+ sh.shardCollection("ecommerce.orders", { orderId: "hashed" });
+```
+
+
+
 
 
 
