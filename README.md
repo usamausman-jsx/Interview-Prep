@@ -2041,3 +2041,260 @@ function Chat() {
 }
 ```
 ✅ WebSockets allow real-time updates in React applications.
+
+
+## 13. System Design & High-Level Architecture
+
+This section covers designing scalable, high-performance, and maintainable React applications.
+
+### 13.1 How do you structure a large-scale React application?
+A well-structured React app improves scalability, maintainability, and performance.
+
+#### 📌 Best Practices:
+- ✔ Separate concerns (Components, Hooks, Context, API).
+- ✔ Use feature-based folder structure.
+- ✔ Implement state management (Context, Redux, Zustand).
+- ✔ Optimize API calls using React Query or SWR.
+- ✔ Use lazy loading and code splitting.
+
+#### 👉 Example Folder Structure for a Large React App:
+
+```bash
+/src
+ ├── components/       # Reusable UI components
+ ├── features/         # Feature-specific components
+ │   ├── auth/
+ │   ├── dashboard/
+ │   ├── profile/
+ ├── hooks/            # Custom hooks
+ ├── services/         # API requests (fetch, axios)
+ ├── store/            # Redux, Zustand, Context API
+ ├── utils/            # Helper functions
+ ├── pages/            # Main page components
+ ├── routes/           # App routing
+ ├── assets/           # Images, styles
+ ├── index.js          # Entry point
+ ├── App.js            # Main component
+```
+
+✅ Keeps the project modular and scalable.
+
+### 13.2 What is Micro Frontends, and why use it?
+Micro Frontends break a large frontend into smaller, independent applications.
+
+#### 📌 Benefits:
+- ✔ Allows multiple teams to work independently.
+- ✔ Reduces deployment risks.
+- ✔ Improves maintainability.
+
+#### 👉 Example (Using Module Federation in Webpack for Micro Frontends):
+
+```javascript
+// Webpack config for microfrontend app
+module.exports = {
+  plugins: [
+    new ModuleFederationPlugin({
+      name: "dashboard",
+      filename: "remoteEntry.js",
+      exposes: {
+        "./Dashboard": "./src/Dashboard",
+      },
+      shared: ["react", "react-dom"],
+    }),
+  ],
+};
+```
+✅ Enables independent deployment of frontend modules.
+
+### 13.3 How do you design a scalable API architecture for React apps?
+#### 📌 Best Practices for Backend APIs:
+- ✔ Use RESTful APIs or GraphQL based on use case.
+- ✔ Implement pagination for large datasets.
+- ✔ Use caching to improve performance.
+- ✔ Secure APIs with JWT authentication.
+
+#### 👉 Example (Node.js API with JWT Authentication):
+
+
+```javascript
+app.post("/login", async (req, res) => {
+  const token = jwt.sign({ userId: req.user.id }, "SECRET_KEY", { expiresIn: "1h" });
+  res.json({ token });
+});
+
+app.get("/profile", authenticate, (req, res) => {
+  res.json({ user: req.user });
+});
+```
+✅ Efficient API design improves frontend performance.
+
+### 13.4 What is Edge Computing, and how does it improve performance?
+Edge computing processes data closer to users (e.g., CDNs, edge servers).
+
+#### 📌 Benefits:
+- ✔ Reduces latency.
+- ✔ Improves load times.
+- ✔ Enhances security.
+
+### 👉 Example (Using Next.js with Vercel Edge Functions):
+
+```javascript
+export default function handler(req, res) {
+  res.json({ message: "Hello from the edge!" });
+}
+```
+✅ Edge computing speeds up web applications by reducing server round trips.
+
+### 13.5 How do you optimize network performance in React applications?
+#### 📌 Optimization Techniques:
+- ✔ Use Compression (Gzip, Brotli) to reduce payload size.
+- ✔ Implement Debouncing & Throttling for API calls.
+- ✔ Use React Query for API caching.
+- ✔ Enable Lazy Loading and Code Splitting.
+
+#### 👉 Example (Debouncing API Requests in React):
+
+
+```javascript
+import { useState } from "react";
+
+function useDebouncedSearch(callback, delay = 300) {
+  const [timer, setTimer] = useState(null);
+
+  return function (...args) {
+    clearTimeout(timer);
+    setTimer(setTimeout(() => callback(...args), delay));
+  };
+}
+```
+✅ Prevents unnecessary API calls and improves user experience.
+
+### 13.6 How do you handle authentication & authorization in a React application?
+#### 📌 Best Practices:
+- ✔ Use JWT for authentication.
+- ✔ Protect routes using PrivateRoute components.
+- ✔ Implement Role-Based Access Control (RBAC).
+
+#### 👉 Example (Protecting Routes in React):
+
+```javascript
+import { Navigate } from "react-router-dom";
+
+function PrivateRoute({ children }) {
+  const isAuthenticated = localStorage.getItem("token");
+  return isAuthenticated ? children : <Navigate to="/login" />;
+  ```
+}
+✅ Ensures only authenticated users can access certain pages.
+
+### 13.7 How do you handle caching in a React application?
+#### 📌 Caching Strategies:
+- ✔ Local Storage / Session Storage for storing small user preferences.
+- ✔ Service Workers for caching static assets.
+- ✔ React Query / SWR for caching API responses.
+- ✔ Redis / CDN for backend data caching.
+
+### 👉 Example (Using React Query for API Caching):
+
+```javascript
+import { useQuery } from "react-query";
+
+function fetchData() {
+  return fetch("/api/data").then(res => res.json());
+}
+
+const { data, isLoading } = useQuery("myData", fetchData, { staleTime: 5000 });
+```
+
+✅ Prevents unnecessary network requests by reusing cached data.
+
+### 13.8 What is Load Balancing, and how does it work?
+Load balancing distributes traffic across multiple servers to improve availability and prevent downtime.
+
+#### 📌 Types of Load Balancing:
+- ✔ Round Robin – Each request goes to the next server in sequence.
+- ✔ Least Connections – Requests go to the server with the fewest active connections.
+- ✔ Geolocation-based – Users are routed to the closest server.
+
+#### 👉 Example (Load Balancing with Nginx):
+
+```bash
+
+upstream mybackend {
+  server backend1.example.com;
+  server backend2.example.com;
+}
+
+server {
+  location / {
+    proxy_pass http://mybackend;
+  }
+}
+```
+✅ Improves performance by distributing requests efficiently.
+
+### 13.9 How do you monitor and debug performance issues in a React app?
+#### 📌 Monitoring Tools:
+- ✔ Google Lighthouse – Analyzes page performance.
+- ✔ React Profiler – Measures component rendering time.
+- ✔ Sentry / LogRocket – Tracks errors in production.
+- ✔ Chrome DevTools – Debugging & performance insights.
+
+#### 👉 Example (Using React Profiler to Identify Slow Components):
+
+
+```javascript
+import { Profiler } from "react";
+
+function MyComponent() {
+  return (
+    <Profiler id="MyComponent" onRender={(id, phase, actualDuration) => {
+      console.log(`Rendered ${id} in ${actualDuration}ms`);
+    }}>
+      <ChildComponent />
+    </Profiler>
+  );
+}
+```
+✅ Identifies slow components and optimizes performance.
+
+### 13.10 What is Feature Flagging, and how does it help in system design?
+Feature flagging enables rolling out new features gradually without redeploying the entire application.
+
+#### 📌 Benefits:
+- ✔ Enables A/B Testing.
+- ✔ Reduces deployment risks.
+- ✔ Allows incremental feature releases.
+
+#### 👉 Example (Using Feature Flags in React):
+
+```javascript
+const features = { newUI: true };
+
+function App() {
+  return features.newUI ? <NewDashboard /> : <OldDashboard />;
+}
+```
+✅ Allows enabling/disabling features dynamically.
+
+### 13.11 How do you implement multi-tenancy in a React application?
+Multi-tenancy allows serving multiple users (tenants) from a single codebase.
+
+#### 📌 Techniques for Multi-Tenancy:
+- ✔ Subdomains (tenant1.app.com).
+- ✔ Custom themes per tenant.
+- ✔ Tenant-based authentication & database partitioning.
+
+#### 👉 Example (Tenant-Based Theming in React):
+
+```javascript
+const tenantThemes = { tenant1: "light", tenant2: "dark" };
+const tenant = window.location.hostname.split(".")[0];
+
+function App() {
+  return <ThemeProvider theme={tenantThemes[tenant] || "default"} />;
+}
+```
+✅ Allows serving multiple customers from the same codebase.
+
+
