@@ -2298,3 +2298,210 @@ function App() {
 ✅ Allows serving multiple customers from the same codebase.
 
 
+## 14. React Patterns
+
+### **14.1. Higher-Order Components (HOCs)**  
+
+#### ✅ **Explanation**  
+A **Higher-Order Component (HOC)** is a function that **takes a component as an argument and returns a new enhanced component**.
+
+📌 **Use Cases of HOCs:**  
+✔ Code reuse (e.g., authentication, theming, logging).  
+✔ Adding additional props (e.g., fetching data).  
+✔ Conditional rendering (e.g., showing a loader before content).  
+
+👉 **Example (HOC for Authentication)**  
+```jsx
+import React from "react";
+
+function withAuth(WrappedComponent) {
+  return function AuthComponent(props) {
+    const isAuthenticated = localStorage.getItem("auth") === "true";
+    return isAuthenticated ? <WrappedComponent {...props} /> : <p>Access Denied</p>;
+  };
+}
+
+const Dashboard = () => <h1>Welcome to the Dashboard</h1>;
+const ProtectedDashboard = withAuth(Dashboard);
+
+export default ProtectedDashboard;
+```
+✅ **The `withAuth` HOC ensures only authenticated users can access the `Dashboard` component.**  
+
+---
+
+### **14.2. Render Props Pattern**  
+
+#### ✅ **Explanation**  
+The **Render Props pattern** is a technique where a component **receives a function as a prop** that determines what should be rendered.
+
+👉 **Example (Mouse Tracker using Render Props)**  
+```jsx
+import React, { useState } from "react";
+
+const MouseTracker = ({ render }) => {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (event) => {
+    setPosition({ x: event.clientX, y: event.clientY });
+  };
+
+  return <div onMouseMove={handleMouseMove}>{render(position)}</div>;
+};
+
+function App() {
+  return (
+    <MouseTracker render={({ x, y }) => <h1>Mouse Position: {x}, {y}</h1>} />
+  );
+}
+```
+✅ **Allows flexible UI rendering without modifying component structure.**  
+
+---
+
+### **14.3. Compound Components**  
+
+#### ✅ **Explanation**  
+**Compound Components** allow components to work together by **sharing state implicitly** rather than passing props down manually.  
+
+👉 **Example (Tabs Component using Compound Components)**  
+```jsx
+import React, { useState } from "react";
+
+const Tabs = ({ children }) => {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  return React.Children.map(children, (child, index) =>
+    React.cloneElement(child, {
+      active: index === activeIndex,
+      onSelect: () => setActiveIndex(index),
+    })
+  );
+};
+
+const Tab = ({ title, active, onSelect }) => (
+  <button onClick={onSelect} style={{ fontWeight: active ? "bold" : "normal" }}>
+    {title}
+  </button>
+);
+
+function App() {
+  return (
+    <Tabs>
+      <Tab title="Tab 1" />
+      <Tab title="Tab 2" />
+      <Tab title="Tab 3" />
+    </Tabs>
+  );
+}
+```
+✅ **This pattern eliminates unnecessary prop-passing and makes the UI declarative.**  
+
+---
+
+### **14.4. Controlled vs. Uncontrolled Components**  
+
+👉 **Example (Controlled Component - React Manages State)**  
+```jsx
+function ControlledInput() {
+  const [value, setValue] = React.useState("");
+
+  return <input value={value} onChange={(e) => setValue(e.target.value)} />;
+}
+```
+
+👉 **Example (Uncontrolled Component - DOM Manages State)**  
+```jsx
+function UncontrolledInput() {
+  const inputRef = React.useRef();
+
+  const handleSubmit = () => {
+    console.log(inputRef.current.value);
+  };
+
+  return <input ref={inputRef} />;
+}
+```
+
+✅ **When integrating third-party libraries or handling form submissions, Uncontrolled Components are useful.**  
+
+---
+
+### **14.5. React Portals**  
+
+👉 **Example (Creating a Modal using Portals)**  
+```jsx
+import ReactDOM from "react-dom";
+
+function Modal({ children }) {
+  return ReactDOM.createPortal(
+    <div className="modal">{children}</div>,
+    document.getElementById("modal-root")
+  );
+}
+
+function App() {
+  return (
+    <div>
+      <h1>Main App</h1>
+      <Modal>
+        <p>This is a modal!</p>
+      </Modal>
+    </div>
+  );
+}
+```
+✅ **Modals now render outside the main component tree to prevent CSS conflicts.**  
+
+---
+
+## 🔹 15. Node.js
+
+### **15.1. Node.js Event Loop**  
+
+📌 **Event Loop Phases:**  
+1. **Timers** → Executes `setTimeout()` & `setInterval()`.  
+2. **I/O Callbacks** → Executes pending I/O callbacks.  
+3. **Poll Phase** → Fetches new I/O events.  
+4. **Check Phase** → Executes `setImmediate()`.  
+5. **Close Callbacks Phase** → Executes `socket.on("close")`.  
+
+👉 **Example:**  
+```js
+console.log("Start");
+
+setTimeout(() => console.log("Timeout"), 0);
+setImmediate(() => console.log("Immediate"));
+process.nextTick(() => console.log("Next Tick"));
+
+console.log("End");
+
+// Output: Start → End → Next Tick → Immediate → Timeout
+```
+✅ **`process.nextTick()` runs before all Event Loop phases.**  
+
+---
+
+### **15.2. Streams in Node.js**  
+
+📌 **Types of Streams:**  
+✔ **Readable** → `fs.createReadStream()`  
+✔ **Writable** → `fs.createWriteStream()`  
+✔ **Duplex** → `net.Socket`  
+✔ **Transform** → `zlib.createGzip()`  
+
+👉 **Example (Reading a File using Streams)**  
+```js
+const fs = require("fs");
+const readStream = fs.createReadStream("large-file.txt");
+
+readStream.on("data", (chunk) => {
+  console.log("Received Chunk:", chunk.length);
+});
+```
+
+✅ **Streams improve performance by processing data in chunks.**  
+
+
+
+
